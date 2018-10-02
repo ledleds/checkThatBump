@@ -1,6 +1,6 @@
 # check-that-bump
 
-> A GitHub App built with [Probot](https://probot.github.io) that An application to read from your package.json to see if the version has been incremented on an open PR.
+A GitHub App built with [Probot](https://probot.github.io) that listens for a new or reopened pull request and reads from the diff from the package.json to see if the version has been incremented on an open PR. If it has not, it will request changes on your PR and leave a comment. 
 
 ## Setup
 
