@@ -18,28 +18,37 @@ function requestChanges(context, issue, reviewComment) {
   });
 }
 
+function checkPullRequest(issue, files, context) {
+  const fileToFind = 'package.json'
+  const foundFile = findFile(files, fileToFind)
+
+  if (foundFile.length === 0) {
+    const reviewComment = "Hey, you haven't made a change to the package.json, I think you need to update the version."
+    requestChanges(context, issue, reviewComment)
+  } else {
+    const regex = new RegExp('[+]+ {2}"version"');
+    const versionChange = regex.test(foundFile[0].patch);
+
+    if (!versionChange) {
+      console.log('No version bump, requesting changes');
+      const reviewComment = "😿 You've forgotten your version bump."
+      requestChanges(context, issue, reviewComment)
+    }
+  }
+}
+
 module.exports = app => {
   app.log('Yay, the app was loaded!')
   
   app.on('pull_request.opened', async context => {
     const issue = context.issue();
     const files = await context.github.pullRequests.getFiles(issue);
-  
-    const fileToFind = 'package.json'
-    const foundFile = findFile(files, fileToFind)
+    checkPullRequest(issue, files, context);
+  });
 
-    if (foundFile.length === 0) {
-      const reviewComment = "Hey, you haven't made a change to the package.json, I think you need to update the version."
-      requestChanges(context, issue, reviewComment)
-    } else {
-      const regex = new RegExp('[+]+ {2}"version"');
-      const versionChange = regex.test(foundFile[0].patch);
-
-      if (!versionChange) {
-        app.log('No version bump, requesting changes');
-        const reviewComment = "😿 You've forgotten your version bump."
-        requestChanges(context, issue, reviewComment)
-      }
-    }
+  app.on('pull_request.reopened', async context => {
+    const issue = context.issue();
+    const files = await context.github.pullRequests.getFiles(issue);
+    checkPullRequest(issue, files, context);
   });
 }
