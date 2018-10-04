@@ -19,8 +19,10 @@ function requestChanges(context, issue, reviewComment) {
 }
 
 function checkPullRequest(issue, files, context) {
+  console.log('In checkPullRequest');
   const fileToFind = 'package.json'
   const foundFile = findFile(files, fileToFind)
+  console.log('Found file length: 'foundFile.length)
 
   if (foundFile.length === 0) {
     const reviewComment = "Hey, you haven't made a change to the package.json, I think you need to update the version."
@@ -41,12 +43,14 @@ module.exports = app => {
   app.log('Yay, the app was loaded!')
   
   app.on('pull_request.opened', async context => {
+    console.log('Pull Request Opened!');
     const issue = context.issue();
     const files = await context.github.pullRequests.getFiles(issue);
     checkPullRequest(issue, files, context);
   });
 
   app.on('pull_request.reopened', async context => {
+    console.log('Pull Request Re-opened!');
     const issue = context.issue();
     const files = await context.github.pullRequests.getFiles(issue);
     checkPullRequest(issue, files, context);
