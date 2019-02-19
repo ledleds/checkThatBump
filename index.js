@@ -4,10 +4,7 @@
  */
 
 function findFile(files, fileToFind) {
-  let foundFile = files.data.filter(file => {
-    return fileToFind === file.filename
-  });
-  return foundFile
+  files.data.filter(file => fileToFind === file.filename);
 }
 
 function requestChanges(context, issue, reviewComment) {
@@ -20,28 +17,29 @@ function requestChanges(context, issue, reviewComment) {
 
 function checkPullRequest(issue, files, context) {
   console.log('In checkPullRequest');
-  const fileToFind = 'package.json'
-  const foundFile = findFile(files, fileToFind)
-  console.log('Found file length: 'foundFile.length)
+  const fileToFind = 'package.json';
+  const foundFile = findFile(files, fileToFind);
+  console.log('Found file length: ', foundFile.length);
 
   if (foundFile.length === 0) {
-    const reviewComment = "Hey, you haven't made a change to the package.json, I think you need to update the version."
-    requestChanges(context, issue, reviewComment)
+    const reviewComment =
+      "Hey, you haven't made a change to the package.json, I think you need to update the version.";
+    requestChanges(context, issue, reviewComment);
   } else {
     const regex = new RegExp('[+]+ {2}"version"');
     const versionChange = regex.test(foundFile[0].patch);
 
     if (!versionChange) {
       console.log('No version bump, requesting changes');
-      const reviewComment = "😿 You've forgotten your version bump."
-      requestChanges(context, issue, reviewComment)
+      const reviewComment = "😿 You've forgotten your version bump.";
+      requestChanges(context, issue, reviewComment);
     }
   }
 }
 
 module.exports = app => {
-  app.log('Yay, the app was loaded!')
-  
+  app.log('Yay, the app was loaded!');
+
   app.on('pull_request.opened', async context => {
     console.log('Pull Request Opened!');
     const issue = context.issue();
@@ -55,4 +53,4 @@ module.exports = app => {
     const files = await context.github.pullRequests.getFiles(issue);
     checkPullRequest(issue, files, context);
   });
-}
+};
