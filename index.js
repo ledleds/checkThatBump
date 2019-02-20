@@ -39,7 +39,7 @@ function checkPullRequest(issue, files, context) {
 }
 
 module.exports = app => {
-  app.log('Yay, the app was loaded!');
+  console.log('Yay, the app was loaded!');
 
   app.on('pull_request.opened', async context => {
     app.log('Pull Request Opened!');
