@@ -44,7 +44,7 @@ module.exports = app => {
     app.log('Pull Request Opened!');
     const issue = context.issue();
     try {
-      const files = await context.github.pullRequests.getFiles(issue);
+      const files = await context.github.pullRequests.listFiles(issue);
       checkPullRequest(issue, files, context);
     } catch (error) {
       app.log('Bad things:', error)
@@ -55,7 +55,7 @@ module.exports = app => {
     app.log('Pull Request Re-opened!');
     const issue = context.issue();
     try {
-      const files = await context.github.pullRequests.getFiles(issue);
+      const files = await context.github.pullRequests.listFiles(issue);
       checkPullRequest(issue, files, context);
     } catch (error) {
       app.log('Bad things:', error)
