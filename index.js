@@ -4,7 +4,7 @@
  */
 
 function findFile(files, fileToFind) {
-  files.data.filter(file => fileToFind === file.filename);
+  return files.data.filter(file => fileToFind === file.filename);
 }
 
 function requestChanges(context, issue, reviewComment) {
@@ -19,10 +19,9 @@ function checkPullRequest(issue, files, context) {
   console.log('In checkPullRequest');
   const fileToFind = 'package.json';
   const foundFile = findFile(files, fileToFind);
-  console.log('Found file length: ', foundFile.length);
 
   if (foundFile.length === 0) {
-    app.log('No change to package.json, requesting changes');
+    console.log('No change to package.json, requesting changes');
     const reviewComment =
       "Hey, you haven't made a change to the package.json, I think you need to update the version.";
     requestChanges(context, issue, reviewComment);
@@ -31,7 +30,7 @@ function checkPullRequest(issue, files, context) {
     const versionChange = regex.test(foundFile[0].patch);
 
     if (!versionChange) {
-      app.log('No version bump, requesting changes');
+      console.log('No version bump, requesting changes');
       const reviewComment = "😿 You've forgotten your version bump.";
       requestChanges(context, issue, reviewComment);
     }
