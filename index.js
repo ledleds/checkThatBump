@@ -22,6 +22,7 @@ function checkPullRequest(issue, files, context) {
   console.log('Found file length: ', foundFile.length);
 
   if (foundFile.length === 0) {
+    app.log('No change to package.json, requesting changes');
     const reviewComment =
       "Hey, you haven't made a change to the package.json, I think you need to update the version.";
     requestChanges(context, issue, reviewComment);
@@ -30,7 +31,7 @@ function checkPullRequest(issue, files, context) {
     const versionChange = regex.test(foundFile[0].patch);
 
     if (!versionChange) {
-      console.log('No version bump, requesting changes');
+      app.log('No version bump, requesting changes');
       const reviewComment = "😿 You've forgotten your version bump.";
       requestChanges(context, issue, reviewComment);
     }
@@ -41,16 +42,24 @@ module.exports = app => {
   app.log('Yay, the app was loaded!');
 
   app.on('pull_request.opened', async context => {
-    console.log('Pull Request Opened!');
+    app.log('Pull Request Opened!');
     const issue = context.issue();
-    const files = await context.github.pullRequests.getFiles(issue);
-    checkPullRequest(issue, files, context);
+    try {
+      const files = await context.github.pullRequests.getFiles(issue);
+      checkPullRequest(issue, files, context);
+    } catch (error) {
+      app.log('Bad things:', error)
+    }
   });
 
   app.on('pull_request.reopened', async context => {
-    console.log('Pull Request Re-opened!');
+    app.log('Pull Request Re-opened!');
     const issue = context.issue();
-    const files = await context.github.pullRequests.getFiles(issue);
-    checkPullRequest(issue, files, context);
+    try {
+      const files = await context.github.pullRequests.getFiles(issue);
+      checkPullRequest(issue, files, context);
+    } catch (error) {
+      app.log('Bad things:', error)
+    }
   });
 };
