@@ -20,7 +20,7 @@ function requestChanges(context, issue, reviewComment) {
 function checkVersionIsIncremented(string) {
   const originalVersion = string.match(/\-[\s]+\"version\":\ "([^\"]*)\"/);
   const changedVersion = string.match(/\+[\s]+\"version\":\ "([^\"]*)\"/);
-  return semver.lt(originalVersion[1], changedVersion[1])
+  return semver.lt(originalVersion[1], changedVersion[1]);
 }
 
 
@@ -36,16 +36,15 @@ function checkPullRequest(issue, files, context) {
   } else {
     const regex = new RegExp('[+]+ {2}"version"');
     const versionChange = regex.test(foundFile[0].patch);
-    
+
     if (!versionChange) {
       const reviewComment = "😿 You've forgotten your version bump.";
       requestChanges(context, issue, reviewComment);
     }
 
-    const isIncremented = checkVersionIsIncremented(foundFile[0].patch)
+    const isIncremented = checkVersionIsIncremented(foundFile[0].patch);
     if (!isIncremented) {
-      const reviewComment =
-      "Hey, you shouldn't decrement the version. 👀";
+      const reviewComment = "Hey, you shouldn't decrement the version. 👀";
     requestChanges(context, issue, reviewComment);
     }
   }
@@ -61,7 +60,7 @@ module.exports = app => {
       const files = await context.github.pullRequests.listFiles(issue);
       checkPullRequest(issue, files, context);
     } catch (error) {
-      app.log('Bad things:', error)
+      app.log('Bad things:', error);
     }
   });
 
@@ -72,7 +71,7 @@ module.exports = app => {
       const files = await context.github.pullRequests.listFiles(issue);
       checkPullRequest(issue, files, context);
     } catch (error) {
-      app.log('Bad things:', error)
+      app.log('Bad things:', error);
     }
   });
 };
