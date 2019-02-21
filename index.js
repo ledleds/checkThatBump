@@ -3,6 +3,8 @@
  * @param {import('probot').Application} app - Probot's Application class.
  */
 
+const semver = require('semver');
+
 function findFile(files, fileToFind) {
   return files.data.filter(file => fileToFind === file.filename);
 }
@@ -15,24 +17,36 @@ function requestChanges(context, issue, reviewComment) {
   });
 }
 
+function checkVersionIsIncremented(string) {
+  const originalVersion = string.match(/\-[\s]+\"version\":\ "([^\"]*)\"/);
+  const changedVersion = string.match(/\+[\s]+\"version\":\ "([^\"]*)\"/);
+  return semver.lt(originalVersion[1], changedVersion[1])
+}
+
+
 function checkPullRequest(issue, files, context) {
-  console.log('In checkPullRequest');
   const fileToFind = 'package.json';
   const foundFile = findFile(files, fileToFind);
 
   if (foundFile.length === 0) {
-    console.log('No change to package.json, requesting changes');
+    // no change to the package.json
     const reviewComment =
-      "Hey, you haven't made a change to the package.json, I think you need to update the version.";
+      "Hey, you haven't made a change to the package.json, I think you need to update the version. 🖖";
     requestChanges(context, issue, reviewComment);
   } else {
     const regex = new RegExp('[+]+ {2}"version"');
     const versionChange = regex.test(foundFile[0].patch);
-
+    
     if (!versionChange) {
-      console.log('No version bump, requesting changes');
       const reviewComment = "😿 You've forgotten your version bump.";
       requestChanges(context, issue, reviewComment);
+    }
+
+    const isIncremented = checkVersionIsIncremented(foundFile[0].patch)
+    if (!isIncremented) {
+      const reviewComment =
+      "Hey, you shouldn't decrement the version. 👀";
+    requestChanges(context, issue, reviewComment);
     }
   }
 }
