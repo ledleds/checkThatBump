@@ -50,7 +50,7 @@ function fileCheck(context, issue, foundFile) {
     const isIncremented = checkVersionIsIncremented(foundFile[0].patch);
 
     if (isIncremented === 'INVALID') {
-      const reviewComment = "It looks like there's something up with the version, you might want to check that. ✌️";
+      const reviewComment = "It looks like there's something up with the version, you might want to check that bump. ✌️";
       requestChanges(context, issue, reviewComment);
       return;
     }
