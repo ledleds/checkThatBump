@@ -21,6 +21,7 @@ function checkVersionIsIncremented(string) {
   const originalVersion = string.match(/\-[\s]+\"version\":\ "([^\"]*)\"/);
   const changedVersion = string.match(/\+[\s]+\"version\":\ "([^\"]*)\"/);
   if (!semver.valid(changedVersion)) {
+    console.log('Version is invalid, was given:', changedVersion)
     return 'INVALID';
   }
   return semver.lt(originalVersion[1], changedVersion[1]);
