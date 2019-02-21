@@ -20,13 +20,27 @@ function requestChanges(context, issue, reviewComment) {
 function checkVersionIsIncremented(string) {
   const originalVersion = string.match(/\-[\s]+\"version\":\ "([^\"]*)\"/);
   const changedVersion = string.match(/\+[\s]+\"version\":\ "([^\"]*)\"/);
-  if (!semver.valid(changedVersion)) {
-    console.log('Version is invalid, was given:', changedVersion)
-    return 'INVALID';
-  }
   return semver.lt(originalVersion[1], changedVersion[1]);
 }
 
+function fileCheck(context, issue, foundFile) {
+  // check for change to version in the diff
+  const regex = new RegExp('[+]+ {2}"version"');
+  const versionChange = regex.test(foundFile[0].patch);
+
+  if (versionChange) {
+    const isIncremented = checkVersionIsIncremented(foundFile[0].patch);
+
+    if (!isIncremented) {
+      const reviewComment = "Hey, you shouldn't decrement the version. 👀";
+      requestChanges(context, issue, reviewComment);
+    }
+    return;
+  }
+
+  const reviewComment = "😿 You've forgotten your version bump.";
+  requestChanges(context, issue, reviewComment);
+}
 
 function checkPullRequestForFile(context, issue, files) {
   const fileToFind = 'package.json';
@@ -40,31 +54,6 @@ function checkPullRequestForFile(context, issue, files) {
   } else {
     fileCheck(context, issue, foundFile);
   }
-}
-
-function fileCheck(context, issue, foundFile) {
-  // check for change to version in the diff
-  const regex = new RegExp('[+]+ {2}"version"');
-  const versionChange = regex.test(foundFile[0].patch);
-
-  if (versionChange) {
-    const isIncremented = checkVersionIsIncremented(foundFile[0].patch);
-
-    if (isIncremented === 'INVALID') {
-      const reviewComment = "It looks like there's something up with the version, you might want to check that bump. ✌️";
-      requestChanges(context, issue, reviewComment);
-      return;
-    }
-
-    if (!isIncremented) {
-      const reviewComment = "Hey, you shouldn't decrement the version. 👀";
-      requestChanges(context, issue, reviewComment);
-    }
-    return;
-  }
-
-  const reviewComment = "😿 You've forgotten your version bump.";
-  requestChanges(context, issue, reviewComment);
 }
 
 module.exports = app => {
