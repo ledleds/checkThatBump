@@ -33,7 +33,7 @@ function fileCheck(context, issue, foundFile) {
     const isIncremented = checkVersionIsIncremented(foundFile[0].patch);
 
     if (!isIncremented) {
-      const reviewComment = "Hey, you shouldn't decrement the version. 👀";
+      const reviewComment = "Hey, are you sure you want to decrement the version? 👀";
       requestChanges(context, issue, reviewComment);
     }
     return;
