@@ -4,12 +4,13 @@
  */
 
 const semver = require('semver');
+const { comments } = require('./snark');
 
 function findFile(files, fileToFind) {
   return files.data.filter(file => fileToFind === file.filename);
 }
 
-function requestChanges(context, issue, reviewComment) {
+function requestChanges(context, issue, reviewComment = comments[Math.floor(Math.random() * comments.length)]) {
   context.github.pullRequests.createReview({
     ...issue,
     body: reviewComment,
@@ -37,9 +38,7 @@ function fileCheck(context, issue, foundFile) {
     }
     return;
   }
-
-  const reviewComment = "😿 You've forgotten your version bump.";
-  requestChanges(context, issue, reviewComment);
+  requestChanges(context, issue);
 }
 
 function checkPullRequestForFile(context, issue, files) {
@@ -48,9 +47,7 @@ function checkPullRequestForFile(context, issue, files) {
 
   if (foundFile.length === 0) {
     // no change to the package.json
-    const reviewComment =
-      "Hey, you haven't made a change to the package.json, you'll need to update the version. 🖖";
-    requestChanges(context, issue, reviewComment);
+    requestChanges(context, issue);
   } else {
     fileCheck(context, issue, foundFile);
   }
