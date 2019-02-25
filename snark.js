@@ -10,8 +10,8 @@ const comments = [
   'Classic JJ…',
   'You are missing the version bump 😇',
   'You need to 🤜 🤛',
-  '![Bonus GIF](https://media.giphy.com/media/nR4L10XlJcSeQ/giphy.gif)',
-  '![Bonus GIF]( https://media.giphy.com/media/3oEduIM2zYS744VHQ4/giphy.gif)',
+  "You've forgotten your version bump. ![Bonus GIF](https://media.giphy.com/media/nR4L10XlJcSeQ/giphy.gif)",
+  "You've forgotten your version bump. ![Bonus GIF]( https://media.giphy.com/media/3oEduIM2zYS744VHQ4/giphy.gif)",
 ];
 
 module.exports = { comments };
